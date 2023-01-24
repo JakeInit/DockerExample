@@ -1,0 +1,32 @@
+docker buildx create --use
+docker buildx build --platform=linux/amd64,linux/arm64 --no-cache=true -t jakeinit/hello_world:0.00.01 \
+	-f ./DockerfileBuildEnv --push .
+
+sudo docker buildx imagetools inspect jakeinit/hello_world:0.00.01
+
+Name:      docker.io/jakeinit/hello_world:0.00.01
+MediaType: application/vnd.docker.distribution.manifest.list.v2+json
+Digest:    sha256:7aa217f7bb18ea20c2b6518a27c79dbd7119de8671a939807bc2097101ee4d0a
+           
+Manifests: 
+  Name:      docker.io/jakeinit/hello_world:0.00.01@sha256:b4b22a5164be8b8e21fe683f40ac139a11a0f3cdf564fd1e591ce3189d7ee89e
+  MediaType: application/vnd.docker.distribution.manifest.v2+json
+  Platform:  linux/amd64
+             
+  Name:      docker.io/jakeinit/hello_world:0.00.01@sha256:93c51b8491c287ddf5eaf7f2c4313c63cc91ce9f7d5c43143405b90ab6437f40
+  MediaType: application/vnd.docker.distribution.manifest.v2+json
+  Platform:  linux/arm64
+
+sudo docker run -it --rm --name="hello_world_build" --workdir=/hello_world --mount type=bind,source=/home/jake/cppLibraries/Docker_HelloWorld,target=/hello_world jakeinit/hello_world:0.00.01@sha256:93c51b8491c287ddf5eaf7f2c4313c63cc91ce9f7d5c43143405b90ab6437f40 bash
+
+Then can run mkdir -p build && cd build && cmake .. && make -j7 && ./helloWorld
+
+sudo docker image save -o hello.tar jakeinit/hello_world:0.00.01@sha256:93c51b8491c287ddf5eaf7f2c4313c63cc91ce9f7d5c43143405b90ab6437f40
+
+On Target device:
+docker load < hello.tar
+
+docker image ls
+
+docker run -t --rm <image id> bash
+

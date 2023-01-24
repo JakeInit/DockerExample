@@ -1,4 +1,4 @@
-PROJECT_NAME=example
+PROJECT_NAME=hello_world
 DOCKER_DEPS_REPO=${PROJECT_NAME}
 DOCKER_CC=gcc
 DOCKER_CXX=g++
@@ -11,4 +11,3 @@ DOCKER_HUB_USER=jakeinit
 DOCKER_SYS_ARCH=linux/amd64,linux/arm64
 
 include buildtools/Makefile
-

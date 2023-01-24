@@ -38,6 +38,7 @@
 docker run --privileged --rm tonistiigi/binfmt --install all
 ```
 
+* If buildx commands ever stop working for arm64, re-run the above. It is likely compatible builders were removed by a prune command.
 * Source for creating images for specific architecture systems found [here](https://developer.arm.com/documentation/102475/0100/Multi-architecture-images)
 * Source for cross compiling (much faster) found [here](https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/)
 
@@ -95,6 +96,7 @@ ENV NVIDIA_DRIVER_CAPABILITIES compute,utility
 ```
 
 ### Project Work Flow <a name="workflow"></a>
+* For specific steps for using emulated arm64 container, see docs/HelloWorld_ARM64_build.txt
 #### Build the Container and image on the Dev Machine <a name="buildcontainer"></a>
 
 * Be certain to have the file "DockerFileBuildEnv" inside the main repo
@@ -204,12 +206,25 @@ sudo docker run -it --rm example/example_build:0.00.01 \
 * It is possible to set up so that docker image runs on target device setup with systemd.
 * This needs looked into.
 
-### Cleaning host machine of all images <a name="cleanup"></a>
+### Cleaning up images <a name="cleanup"></a>
 
 * Removes all images on the hosted machine
 
 ```
-sudo docker prune -a
+sudo docker image prune -a
+```
+
+* Removes image by id.
+
+```
+sudo docker image ls
+sudo docker rmi <imageID>
+```
+
+* If docker cannot remove the image, can be forced by adding -f option, or can kill all running containers
+
+```
+docker kill $(docker ps -q)
 ```
 
 ### Using make to implement docker commands <a name="makecommands"></a>
