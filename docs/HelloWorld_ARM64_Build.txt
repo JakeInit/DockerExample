@@ -1,7 +1,13 @@
+This document shows how to create an image for an arm device on a desktop using hello_world.
+Then it is shown how to save the image and move it to the arm device.
+
+This sections shows how the image was created. There is no need to run these commands unless
+	replacing the user.
 docker buildx create --use
 docker buildx build --platform=linux/amd64,linux/arm64 --no-cache=true -t jakeinit/hello_world:0.00.01 \
 	-f ./DockerfileBuildEnv --push .
 
+This is how to look at the images that were created in the repo
 sudo docker buildx imagetools inspect jakeinit/hello_world:0.00.01
 
 Name:      docker.io/jakeinit/hello_world:0.00.01
@@ -12,7 +18,7 @@ Manifests:
   Name:      docker.io/jakeinit/hello_world:0.00.01@sha256:b4b22a5164be8b8e21fe683f40ac139a11a0f3cdf564fd1e591ce3189d7ee89e
   MediaType: application/vnd.docker.distribution.manifest.v2+json
   Platform:  linux/amd64
-             
+
   Name:      docker.io/jakeinit/hello_world:0.00.01@sha256:93c51b8491c287ddf5eaf7f2c4313c63cc91ce9f7d5c43143405b90ab6437f40
   MediaType: application/vnd.docker.distribution.manifest.v2+json
   Platform:  linux/arm64
@@ -21,12 +27,19 @@ sudo docker run -it --rm --name="hello_world_build" --workdir=/hello_world --mou
 
 Then can run mkdir -p build && cd build && cmake .. && make -j7 && ./helloWorld
 
+Note that the sha ID for the arm device is used below
 sudo docker image save -o hello.tar jakeinit/hello_world:0.00.01@sha256:93c51b8491c287ddf5eaf7f2c4313c63cc91ce9f7d5c43143405b90ab6437f40
 
-On Target device:
+Move hello.tar to the target device.
+
+On Target arm device:
 docker load < hello.tar
 
+Create a git volume if desired:
+docker volume create git_volume
+
+Show docker images in the current directory:
 docker image ls
 
-docker run -t --rm <image id> bash
-
+Run the image (can ommit volume if not needed):
+docker run -it --rm -v git_volume:/git <image id> bash
