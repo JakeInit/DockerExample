@@ -1,0 +1,38 @@
+FROM ubuntu:18.04
+LABEL Description="Production environment"
+
+ENV HOME /root
+
+SHELL ["/bin/bash", "-c"]
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections && \
+    apt-get update && apt-get upgrade -y && apt-get -y --no-install-recommends install \
+    build-essential \
+    git \
+    wget \
+    python3-pip \
+    python-setuptools \
+    curl \
+    pkg-config \
+    libgl1-mesa-dev \
+    libssl-dev \
+    sudo \
+    nano \
+    grep \
+    gawk \
+    gnupg2
+
+# add file to root in final build from current host directory level
+ADD start_zerotier.sh /root/
+
+RUN chmod a+x /root/start_zerotier.sh && echo './root/start_zerotier.sh' >> /root/.bashrc && \
+    git clone https://github.com/Kitware/CMake -b v3.21.3 && \
+    cd CMake && ./bootstrap && make -j$(($(nproc) - 1)) && make install && cd .. && rm -r CMake
+
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 1657198823E52A61 && \
+    curl -s https://install.zerotier.com | bash
+
+# clean up space
+RUN mkdir git && apt-get remove --purge wget curl git build-essential gawk -y && apt-get autoremove -y

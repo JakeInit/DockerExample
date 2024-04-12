@@ -1,12 +1,12 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.10)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif()
 
-project(helloWorld VERSION 0.0.1 DESCRIPTION "Docker Hello")
+project(Example VERSION 0.0.1 DESCRIPTION "Example Project")
 set(CMAKE_CXX_STANDARD 17)
-#set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Make Executable(s)
 add_executable (${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/src/main.cpp)

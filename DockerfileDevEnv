@@ -1,0 +1,62 @@
+#FROM ubuntu:18.04 AS intermediate
+#
+#ENV HOME /root
+#
+#ARG DEBIAN_FRONTEND=noninteractive
+#
+# Below used to be able to clone git repositories
+#COPY id_rsa /root/.ssh/id_rsa
+#RUN chmod 600 /root/.ssh/id_rsa
+#
+#RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections && \
+#    apt-get update && apt-get upgrade -y && apt-get -y --no-install-recommends install \
+#    build-essential \
+#    ssh \
+#    python3-pip \
+#    python-setuptools \
+#    git
+#
+#RUN touch /root/.ssh/known_hosts && ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts && \
+#    git clone some_git_url && \
+#    cd some_git_name && mkdir -p build
+
+FROM ubuntu:18.04
+LABEL Description="Development Environment"
+
+ENV HOME /root
+
+SHELL ["/bin/bash", "-c"]
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections && \
+    apt-get update && apt-get upgrade -y && apt-get -y --no-install-recommends install \
+    build-essential \
+    git \
+    wget \
+    python3-pip \
+    python-setuptools \
+    curl \
+    pkg-config \
+    libgl1-mesa-dev \
+    libssl-dev \
+    sudo \
+    nano \
+    gawk \
+    grep \
+    gnupg2
+
+RUN git clone https://github.com/Kitware/CMake -b v3.21.3 && \
+    cd CMake && ./bootstrap && make -j$(($(nproc) - 1)) && make install && cd .. && rm -r CMake
+
+# copy a folder from intermediate to the final build
+#COPY --from=intermediate /root/someFolder /root/someFolder
+#
+# allows chaning text in a file
+#RUN apt-get autoremove -y && \
+#    if [ "$(uname -m)" == "aarch64" ]; then \
+#      gawk -i inplace '/default_profile/{gsub(/oldText/, "newText", $3)};{print}' /root/pathToAFile; \
+#    fi
+#
+# copy from intermediate build to location on final build
+#COPY --from=intermediate some_git_name /git/some_git_name
